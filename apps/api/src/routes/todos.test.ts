@@ -1,3 +1,4 @@
+import '../test/setup-env.js'
 import assert from 'node:assert/strict'
 import { after, before, beforeEach, describe, it } from 'node:test'
 import { buildServer } from '../app.js'

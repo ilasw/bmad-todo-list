@@ -34,6 +34,14 @@ Full-stack todo app monorepo: React (Vite) + Fastify API + PostgreSQL.
 
    The database listens on `localhost:5432` by default (override with `POSTGRES_HOST_PORT` in `.env` if port 5432 is already in use — update `DATABASE_URL` to use the same port).
 
+   Use `-d` to keep Postgres running in the background so todos survive API/web restarts:
+
+   ```bash
+   docker compose up -d db
+   ```
+
+   **Data persistence:** todos are stored in the Docker volume `todo_list_db_data`. Restarting the API or web app does not clear them. Avoid `docker compose down -v` unless you intentionally want to wipe the database. API tests use `TEST_DATABASE_URL` (separate database) so running tests does not delete your dev todos.
+
 5. **Run database migrations**
 
    ```bash
