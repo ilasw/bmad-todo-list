@@ -32,16 +32,16 @@ export function AddTaskForm() {
     event.preventDefault()
     setSubmitError(null)
 
-    const message = getValidationMessage(draftDescription)
-    if (message) {
-      setValidationMessage(message)
+    const parsed = createTodoSchema.safeParse({ description: draftDescription })
+    if (!parsed.success) {
+      setValidationMessage(getValidationMessage(draftDescription))
       return
     }
 
     setValidationMessage(null)
 
     createTodoMutation.mutate(
-      { description: draftDescription },
+      parsed.data,
       {
         onSuccess: () => {
           clearDraftDescription()

@@ -29,3 +29,7 @@
 - **Health endpoint does not verify database connectivity** — Story 1.1 health check scope; extend when ops require it.
 
 - **No graceful shutdown handlers (SIGINT/SIGTERM)** — Epic 2 container lifecycle scope.
+
+## Deferred from: code review of 1-3-view-create-tasks-in-the-ui (2026-05-21)
+
+- **Redundant refetch after every create** — `onSettled` calls `invalidateQueries` after optimistic create already updates cache; may cause unnecessary network churn. Optimize if flicker or load becomes noticeable.

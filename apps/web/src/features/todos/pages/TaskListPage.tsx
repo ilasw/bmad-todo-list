@@ -7,6 +7,7 @@ import { useTodos } from '../hooks/use-todos.js'
 
 export function TaskListPage() {
   const { data, isPending, isError, error, isSuccess, refetch } = useTodos()
+  const todos = data ?? []
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
@@ -22,7 +23,7 @@ export function TaskListPage() {
       </section>
 
       <section>
-        {isPending && <LoadingSpinner />}
+        {isPending && todos.length === 0 && <LoadingSpinner />}
 
         {isError && (
           <ErrorBanner
@@ -35,9 +36,9 @@ export function TaskListPage() {
           />
         )}
 
-        {isSuccess && data.length === 0 && <EmptyState />}
+        {isSuccess && todos.length === 0 && <EmptyState />}
 
-        {isSuccess && data.length > 0 && <TaskList todos={data} />}
+        {todos.length > 0 && <TaskList todos={todos} />}
       </section>
     </main>
   )

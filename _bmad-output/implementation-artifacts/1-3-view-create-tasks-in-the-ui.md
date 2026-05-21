@@ -1,6 +1,6 @@
 # Story 1.3: View & Create Tasks in the UI
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -42,6 +42,14 @@ so that I can capture todos without friction (UJ-1).
   - [x] Show description, completion checkbox (read-only toggle wiring in 1.4), tags placeholder (empty until 1.6), `createdAt` formatted
 - [x] Wire CORS (AC: 1)
   - [x] Ensure API cors plugin allows `http://localhost:5173`
+
+### Review Findings
+
+- [x] [Review][Patch] Optimistic todos not shown while query is pending or errored — `TaskListPage` renders `TaskList` only when `isSuccess && data.length > 0`, so optimistic cache updates from `useCreateTodo` are invisible during initial load (`isPending`) or after a failed fetch (`isError`). Violates AC2/NFR1 immediate appearance. [`apps/web/src/features/todos/pages/TaskListPage.tsx:38-40`]
+- [x] [Review][Patch] No automated test for failed-create draft preservation (AC5) — `AddTaskForm.test.tsx` covers validation only; no test mocks a failed mutation and asserts the input retains the typed description. [`apps/web/src/features/todos/AddTaskForm.test.tsx`]
+- [x] [Review][Patch] No automated test for fetch failure + retry (AC4) — no test covers `TaskListPage`/`useTodos` error banner and retry callback when `fetchTodos` rejects. [`apps/web/src/features/todos/pages/TaskListPage.tsx`]
+- [x] [Review][Patch] Untrimmed description sent to mutation — `AddTaskForm` passes raw `draftDescription` while optimistic UI trims via `input.description.trim()`; submit should use schema-parsed/trimmed value for consistency. [`apps/web/src/features/todos/AddTaskForm.tsx:43-44`, `apps/web/src/features/todos/hooks/use-todos.ts:26`]
+- [x] [Review][Defer] Redundant refetch after every create — `onSettled` calls `invalidateQueries` after optimistic create already updates cache; may cause unnecessary network churn. [`apps/web/src/features/todos/hooks/use-todos.ts:51-53`] — deferred, pre-existing
 
 ## Dev Notes
 
@@ -153,4 +161,4 @@ Composer (Cursor)
 
 ## Change Log
 
-- 2026-05-21: Story 1.3 — view & create tasks UI with TanStack Query, Zustand draft store, optimistic create, and dev CORS for Vite.
+- 2026-05-21: Code review — fixed optimistic list visibility, trimmed submit payload, added AC4/AC5 tests.
