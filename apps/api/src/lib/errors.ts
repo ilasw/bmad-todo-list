@@ -1,4 +1,4 @@
-export type ApiErrorCode = 'VALIDATION_ERROR' | 'INTERNAL_ERROR'
+export type ApiErrorCode = 'VALIDATION_ERROR' | 'NOT_FOUND' | 'INTERNAL_ERROR'
 
 export interface ApiErrorBody {
   error: {
@@ -27,6 +27,10 @@ export function validationError(
   details: unknown = null,
 ): ApiErrorBody {
   return createErrorBody('VALIDATION_ERROR', message, details)
+}
+
+export function notFoundError(message = 'Resource not found'): ApiErrorBody {
+  return createErrorBody('NOT_FOUND', message, null)
 }
 
 export function internalError(message = 'An unexpected error occurred'): ApiErrorBody {

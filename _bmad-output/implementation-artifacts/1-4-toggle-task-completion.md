@@ -1,6 +1,6 @@
 # Story 1.4: Toggle Task Completion
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -20,23 +20,23 @@ so that I can track progress and fix mistakes (UJ-2).
 
 ## Tasks / Subtasks
 
-- [ ] API: PATCH endpoint (AC: 5)
-  - [ ] Add `updateTodoSchema` to `packages/shared` — partial `{ completed: boolean }` (and extensible for later fields)
-  - [ ] Extend `todo-service.ts` with `updateTodo(id, input)`
-  - [ ] Add `PATCH /api/v1/todos/:id` in `routes/todos.ts` — 404 if not found
-- [ ] API client (AC: 1–4)
-  - [ ] Add `updateTodo(id, { completed })` to `apps/web/src/api/todos.ts`
-- [ ] Optimistic toggle mutation (AC: 1, 2, 4)
-  - [ ] Add `useToggleTodo` or extend `use-todos.ts` with toggle mutation
-  - [ ] `onMutate`: cancel queries, snapshot previous, flip `completed` in cache
-  - [ ] `onError`: restore snapshot, surface error via ErrorBanner or inline toast
-  - [ ] `onSettled`: invalidate `['todos']`
-- [ ] UI wiring (AC: 1, 2, 9)
-  - [ ] Wire checkbox/toggle in `TaskItem.tsx` to toggle mutation
-  - [ ] Add distinct Tailwind styles for completed vs active (strikethrough, muted color, etc.)
-  - [ ] Disable toggle control while mutation `isPending` for that item
-- [ ] Persistence verification (AC: 3)
-  - [ ] Manual test: toggle → refresh → status retained
+- [x] API: PATCH endpoint (AC: 5)
+  - [x] Add `updateTodoSchema` to `packages/shared` — partial `{ completed: boolean }` (and extensible for later fields)
+  - [x] Extend `todo-service.ts` with `updateTodo(id, input)`
+  - [x] Add `PATCH /api/v1/todos/:id` in `routes/todos.ts` — 404 if not found
+- [x] API client (AC: 1–4)
+  - [x] Add `updateTodo(id, { completed })` to `apps/web/src/api/todos.ts`
+- [x] Optimistic toggle mutation (AC: 1, 2, 4)
+  - [x] Add `useToggleTodo` or extend `use-todos.ts` with toggle mutation
+  - [x] `onMutate`: cancel queries, snapshot previous, flip `completed` in cache
+  - [x] `onError`: restore snapshot, surface error via ErrorBanner or inline toast
+  - [x] `onSettled`: invalidate `['todos']`
+- [x] UI wiring (AC: 1, 2, 9)
+  - [x] Wire checkbox/toggle in `TaskItem.tsx` to toggle mutation
+  - [x] Add distinct Tailwind styles for completed vs active (strikethrough, muted color, etc.)
+  - [x] Disable toggle control while mutation `isPending` for that item
+- [x] Persistence verification (AC: 3)
+  - [x] Manual test: toggle → refresh → status retained
 
 ## Dev Notes
 
@@ -92,10 +92,38 @@ Stories 1.2–1.3 provide: todos CRUD (list/create), TanStack Query cache with `
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Composer
 
 ### Debug Log References
 
+- Fixed flaky API route GET test by locating created todo by id (parallel DB writes from multiple suites).
+- Set API test runner to `--test-concurrency=1` to avoid shared-database race conditions between route and service suites.
+
 ### Completion Notes List
 
+- Added `updateTodoSchema` and `UpdateTodoInput` type in shared package for PATCH body validation.
+- Implemented `updateTodo` service and `PATCH /api/v1/todos/:id` route with `NOT_FOUND` error handling.
+- Added `useToggleTodo` mutation with optimistic cache update, error rollback, and query invalidation.
+- Wired `TaskItem` checkbox to toggle mutation with completed/active styling and per-item pending disable.
+- Added API route tests (200/404/400), service test for update logic, and UI tests for optimistic toggle and error revert.
+- Persistence (AC3) verified via API integration: PATCH persists to DB and subsequent GET returns updated `completed` state.
+
 ### File List
+
+- packages/shared/src/schemas/todo.ts
+- packages/shared/src/types/index.ts
+- packages/shared/src/index.ts
+- apps/api/src/lib/errors.ts
+- apps/api/src/services/todo-service.ts
+- apps/api/src/services/todo-service.test.ts
+- apps/api/src/routes/todos.ts
+- apps/api/src/routes/todos.test.ts
+- apps/api/package.json
+- apps/web/src/api/todos.ts
+- apps/web/src/features/todos/hooks/use-todos.ts
+- apps/web/src/features/todos/TaskItem.tsx
+- apps/web/src/features/todos/TaskItem.test.tsx
+
+## Change Log
+
+- 2026-05-21: Implemented toggle task completion — PATCH API, optimistic UI mutation, styling, and tests (Story 1.4)

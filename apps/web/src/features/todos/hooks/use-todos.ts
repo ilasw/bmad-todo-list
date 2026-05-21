@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { CreateTodoInput, Todo } from '@todo-list/shared'
-import { createTodo, fetchTodos } from '../../../api/todos.js'
+import { createTodo, fetchTodos, updateTodo } from '../../../api/todos.js'
 
 export const TODOS_QUERY_KEY = ['todos'] as const
 
@@ -47,6 +47,36 @@ export function useCreateTodo() {
           todo.id === context?.optimisticId ? createdTodo : todo,
         ),
       )
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY })
+    },
+  })
+}
+
+export function useToggleTodo() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, completed }: { id: string; completed: boolean }) =>
+      updateTodo(id, { completed }),
+    onMutate: async ({ id, completed }) => {
+      await queryClient.cancelQueries({ queryKey: TODOS_QUERY_KEY })
+
+      const previousTodos = queryClient.getQueryData<Todo[]>(TODOS_QUERY_KEY)
+
+      queryClient.setQueryData<Todo[]>(TODOS_QUERY_KEY, (old = []) =>
+        old.map((todo) =>
+          todo.id === id ? { ...todo, completed } : todo,
+        ),
+      )
+
+      return { previousTodos }
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousTodos !== undefined) {
+        queryClient.setQueryData(TODOS_QUERY_KEY, context.previousTodos)
+      }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY })

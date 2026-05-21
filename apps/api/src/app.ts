@@ -61,6 +61,7 @@ export async function buildServer() {
     origin: isProduction
       ? process.env.CORS_ORIGIN?.split(',').map((o) => o.trim()) ?? false
       : ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    methods: ['GET', 'HEAD', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   })
 
   await fastify.register(helmet)

@@ -1,5 +1,5 @@
-import { desc } from 'drizzle-orm'
-import type { CreateTodoInput, Todo } from '@todo-list/shared'
+import { desc, eq } from 'drizzle-orm'
+import type { CreateTodoInput, Todo, UpdateTodoInput } from '@todo-list/shared'
 import type { FastifyInstance } from 'fastify'
 import { todos } from '../db/schema.js'
 
@@ -33,6 +33,24 @@ export async function createTodo(
 
   if (!row) {
     throw new Error('Failed to create todo')
+  }
+
+  return mapTodoRow(row)
+}
+
+export async function updateTodo(
+  fastify: FastifyInstance,
+  id: string,
+  input: UpdateTodoInput,
+): Promise<Todo | null> {
+  const [row] = await fastify.db
+    .update(todos)
+    .set({ completed: input.completed })
+    .where(eq(todos.id, id))
+    .returning()
+
+  if (!row) {
+    return null
   }
 
   return mapTodoRow(row)

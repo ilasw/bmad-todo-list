@@ -3,8 +3,10 @@ import {
   createTodoSchema,
   todoListSchema,
   todoSchema,
+  updateTodoSchema,
 } from '@todo-list/shared'
-import { createTodo, listTodos } from '../services/todo-service.js'
+import { notFoundError } from '../lib/errors.js'
+import { createTodo, listTodos, updateTodo } from '../services/todo-service.js'
 
 const todoRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
@@ -34,6 +36,33 @@ const todoRoutes: FastifyPluginAsyncZod = async (fastify) => {
     async (request, reply) => {
       const todo = await createTodo(request.server, request.body)
       return reply.status(201).send(todo)
+    },
+  )
+
+  fastify.patch(
+    '/todos/:id',
+    {
+      schema: {
+        tags: ['todos'],
+        params: todoSchema.pick({ id: true }),
+        body: updateTodoSchema,
+        response: {
+          200: todoSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      const todo = await updateTodo(
+        request.server,
+        request.params.id,
+        request.body,
+      )
+
+      if (!todo) {
+        return reply.status(404).send(notFoundError('Todo not found'))
+      }
+
+      return todo
     },
   )
 }

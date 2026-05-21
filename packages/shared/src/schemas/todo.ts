@@ -4,6 +4,12 @@ export const createTodoSchema = z.object({
   description: z.string().trim().min(1).max(2500),
 })
 
+export const updateTodoSchema = z
+  .object({
+    completed: z.boolean(),
+  })
+  .strict()
+
 export const todoSchema = z.object({
   id: z.string().uuid(),
   description: z.string().max(2500),

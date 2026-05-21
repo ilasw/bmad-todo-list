@@ -1,4 +1,6 @@
 import type { Todo } from '@todo-list/shared'
+import { useState } from 'react'
+import { useToggleTodo } from './hooks/use-todos.js'
 
 interface TaskItemProps {
   todo: Todo
@@ -12,18 +14,51 @@ function formatCreatedAt(iso: string): string {
 }
 
 export function TaskItem({ todo }: TaskItemProps) {
+  const toggleTodoMutation = useToggleTodo()
+  const [toggleError, setToggleError] = useState<string | null>(null)
+  const isPending =
+    toggleTodoMutation.isPending &&
+    toggleTodoMutation.variables?.id === todo.id
+
+  const handleToggle = () => {
+    setToggleError(null)
+    toggleTodoMutation.mutate(
+      { id: todo.id, completed: !todo.completed },
+      {
+        onError: (error) => {
+          setToggleError(
+            error instanceof Error
+              ? error.message
+              : 'Failed to update task. Please try again.',
+          )
+        },
+      },
+    )
+  }
+
   return (
-    <li className="flex gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
+    <li
+      className={`flex gap-3 rounded-lg border px-4 py-3 shadow-sm ${
+        todo.completed
+          ? 'border-slate-200 bg-slate-50'
+          : 'border-slate-200 bg-white'
+      }`}
+    >
       <input
         type="checkbox"
         checked={todo.completed}
-        readOnly
-        aria-label={`Mark "${todo.description}" complete`}
-        className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300"
+        onChange={handleToggle}
+        disabled={isPending}
+        aria-label={`Mark "${todo.description}" ${todo.completed ? 'active' : 'complete'}`}
+        className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300 disabled:cursor-not-allowed disabled:opacity-60"
       />
       <div className="min-w-0 flex-1">
         <p
-          className={`break-words text-slate-900 ${todo.completed ? 'line-through text-slate-500' : ''}`}
+          className={`break-words ${
+            todo.completed
+              ? 'text-slate-500 line-through decoration-slate-400'
+              : 'text-slate-900'
+          }`}
         >
           {todo.description}
         </p>
@@ -35,6 +70,11 @@ export function TaskItem({ todo }: TaskItemProps) {
             </span>
           ) : null}
         </div>
+        {toggleError ? (
+          <p className="mt-2 text-sm text-red-700" role="alert">
+            {toggleError}
+          </p>
+        ) : null}
       </div>
     </li>
   )

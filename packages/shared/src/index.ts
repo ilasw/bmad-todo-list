@@ -8,8 +8,9 @@ export type HealthResponse = z.infer<typeof healthSchema>
 
 export {
   createTodoSchema,
+  updateTodoSchema,
   todoSchema,
   todoListSchema,
 } from './schemas/todo.js'
 
-export type { CreateTodoInput, Todo } from './types/index.js'
+export type { CreateTodoInput, UpdateTodoInput, Todo } from './types/index.js'
