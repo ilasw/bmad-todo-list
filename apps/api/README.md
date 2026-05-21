@@ -1,23 +1,17 @@
-# Getting Started with [Fastify-CLI](https://www.npmjs.com/package/fastify-cli)
-This project was bootstrapped with Fastify-CLI.
+# @todo-list/api
 
-## Available Scripts
+Fastify 5 API (TypeScript, ESM).
 
-In the project directory, you can run:
+## Scripts
 
-### `npm run dev`
+| Command       | Description                    |
+|---------------|--------------------------------|
+| `pnpm dev`    | Start dev server with hot reload |
+| `pnpm build`  | Compile TypeScript to `dist/`  |
+| `pnpm start`  | Run compiled server            |
 
-To start the app in dev mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Endpoints
 
-### `npm start`
+- `GET /health` — returns `{ "status": "ok" }`
 
-For production mode
-
-### `npm run test`
-
-Run the test cases.
-
-## Learn More
-
-To learn Fastify, check out the [Fastify documentation](https://fastify.dev/docs/latest/).
+Loads environment variables from the repo root `.env` file (see root `.env.example`).

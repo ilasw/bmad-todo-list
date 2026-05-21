@@ -1,6 +1,6 @@
 # Story 1.1: Monorepo Scaffold & Dev Environment
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -20,23 +20,61 @@ so that I can run the full-stack app locally and build features on a consistent 
 
 ## Tasks / Subtasks
 
-- [ ] Initialize monorepo root (AC: 1, 2)
-  - [ ] Create root `package.json`, `pnpm-workspace.yaml`, `.gitignore`
-  - [ ] Add root scripts: `dev` → `pnpm --parallel -r dev`, `build` → `pnpm -r build`
-- [ ] Scaffold API with create-fastify (AC: 1, 2)
-  - [ ] Run `pnpm dlx create-fastify apps/api`; ensure Fastify 5 + TypeScript + ESM
-  - [ ] Configure `apps/api` dev script on port 3000; add health route `GET /health` returning `{ status: "ok" }`
-- [ ] Scaffold web with Vite react-ts (AC: 1, 2)
-  - [ ] Run `pnpm create vite apps/web --template react-ts`
-  - [ ] Configure Vite dev server on port 5173; show placeholder page confirming app loads
-- [ ] Create shared package (AC: 2)
-  - [ ] Create `packages/shared` with `zod` dependency
-  - [ ] Export placeholder schema from `packages/shared/src/index.ts`
-  - [ ] Wire `workspace:*` deps in both apps; verify imports compile
-- [ ] Environment & Docker db only (AC: 4, 5)
-  - [ ] Add root `.env.example` with documented vars
-  - [ ] Add `docker-compose.yml` with `db` service: PostgreSQL 16 Alpine, named volume, port 5432
-  - [ ] Document setup in root `README.md` (minimal: clone, install, env, db, dev)
+- [x] Initialize monorepo root (AC: 1, 2)
+  - [x] Create root `package.json`, `pnpm-workspace.yaml`, `.gitignore`
+  - [x] Add root scripts: `dev` → `pnpm --parallel -r dev`, `build` → `pnpm -r build`
+- [x] Scaffold API with create-fastify (AC: 1, 2)
+  - [x] Run `pnpm dlx create-fastify apps/api`; ensure Fastify 5 + TypeScript + ESM
+  - [x] Configure `apps/api` dev script on port 3000; add health route `GET /health` returning `{ status: "ok" }`
+- [x] Scaffold web with Vite react-ts (AC: 1, 2)
+  - [x] Run `pnpm create vite apps/web --template react-ts`
+  - [x] Configure Vite dev server on port 5173; show placeholder page confirming app loads
+- [x] Create shared package (AC: 2)
+  - [x] Create `packages/shared` with `zod` dependency
+  - [x] Export placeholder schema from `packages/shared/src/index.ts`
+  - [x] Wire `workspace:*` deps in both apps; verify imports compile
+- [x] Environment & Docker db only (AC: 4, 5)
+  - [x] Add root `.env.example` with documented vars
+  - [x] Add `docker-compose.yml` with `db` service: PostgreSQL 16 Alpine, named volume, port 5432
+  - [x] Document setup in root `README.md` (minimal: clone, install, env, db, dev)
+
+### Review Findings
+
+- [x] [Review][Decision] API not scaffolded with create-fastify — **Resolved:** keep hand-rolled server; remove empty `plugins/`/`routes/` dirs and stale Fastify-CLI READMEs (see patch item below).
+
+- [x] [Review][Decision] Shared package distribution strategy — **Resolved:** keep source-first exports (`./src/index.ts`); acceptable monorepo dev pattern with tsx/Vite.
+
+- [x] [Review][Patch] `.env` file not loaded by API [apps/api/src/server.ts:4] — added `dotenv` loading repo root `.env`.
+
+- [x] [Review][Patch] README understates dev processes [README.md:43] — updated to list all three workspaces.
+
+- [x] [Review][Patch] TypeScript version mismatch [apps/web/package.json:27] — aligned web to `^5.8.0`.
+
+- [x] [Review][Patch] `@types/node` version mismatch — aligned web to `^22.15.0`.
+
+- [x] [Review][Patch] Invalid `PORT` silently mishandled [apps/api/src/server.ts:4] — added `parsePort` validation.
+
+- [x] [Review][Patch] Vite port not enforced [apps/web/vite.config.ts:7] — added `strictPort: true`.
+
+- [x] [Review][Patch] Stale Fastify-CLI boilerplate [apps/api/README.md] — removed plugins/routes READMEs; rewrote api README.
+
+- [x] [Review][Patch] Unused Vite template cruft [apps/web/] — removed unused assets and simplified `index.css`.
+
+- [x] [Review][Patch] No `packageManager` pin [package.json] — added `packageManager: pnpm@10.27.0`.
+
+- [x] [Review][Patch] Story completion artifacts missing — tasks, file list, and status updated.
+
+- [x] [Review][Patch] No engine enforcement [package.json:9] — added `.npmrc` with `engine-strict=true`.
+
+- [x] [Review][Defer] docker-compose credentials hardcoded [docker-compose.yml:7] — deferred, README implies `.env` drives DB creds but compose uses inline `POSTGRES_*`; acceptable for story 1.1 db-only scaffold.
+
+- [x] [Review][Defer] `VITE_API_URL` unused [.env.example:5] — deferred, web does not call API yet; expected in later stories.
+
+- [x] [Review][Defer] No CORS configuration [apps/api/src/server.ts] — deferred, needed when web calls API in story 1.3+.
+
+- [x] [Review][Defer] No graceful shutdown handlers [apps/api/src/server.ts] — deferred, container lifecycle handling deferred to Epic 2.
+
+- [x] [Review][Defer] `DATABASE_URL` unused [.env.example:2] — deferred, API does not connect to DB yet; story 1.2 scope.
 
 ## Dev Notes
 
@@ -100,10 +138,38 @@ todo-list/
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Composer
 
 ### Debug Log References
 
 ### Completion Notes List
 
+- Monorepo scaffold implemented with pnpm workspaces (api, web, shared).
+- API uses hand-rolled Fastify 5 server with `/health` route (accepted deviation from create-fastify scaffold).
+- Shared package uses source-first TypeScript exports consumed by tsx/Vite.
+- Code review patches applied: dotenv loading, PORT validation, strictPort, version alignment, boilerplate cleanup, `.npmrc` engine-strict, packageManager pin.
+
 ### File List
+
+- `.env.example`
+- `.gitignore`
+- `.npmrc`
+- `README.md`
+- `docker-compose.yml`
+- `package.json`
+- `pnpm-lock.yaml`
+- `pnpm-workspace.yaml`
+- `apps/api/package.json`
+- `apps/api/README.md`
+- `apps/api/src/server.ts`
+- `apps/api/tsconfig.json`
+- `apps/web/package.json`
+- `apps/web/index.html`
+- `apps/web/vite.config.ts`
+- `apps/web/src/App.tsx`
+- `apps/web/src/App.css`
+- `apps/web/src/index.css`
+- `apps/web/src/main.tsx`
+- `packages/shared/package.json`
+- `packages/shared/src/index.ts`
+- `packages/shared/tsconfig.json`

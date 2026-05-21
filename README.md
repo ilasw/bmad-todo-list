@@ -40,7 +40,7 @@ Full-stack todo app monorepo: React (Vite) + Fastify API + PostgreSQL.
    pnpm dev
    ```
 
-   This starts both workspaces in parallel:
+   This starts all workspaces in parallel (api, web, and shared type-check watcher):
 
    - **API:** http://localhost:3000
    - **Web:** http://localhost:5173
