@@ -1,6 +1,6 @@
 # Story 1.3: View & Create Tasks in the UI
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -20,28 +20,28 @@ so that I can capture todos without friction (UJ-1).
 
 ## Tasks / Subtasks
 
-- [ ] Frontend dependencies & setup (AC: 1–5)
-  - [ ] Add TanStack Query, Zustand, React Router, Tailwind CSS to `apps/web`
-  - [ ] Configure Tailwind + PostCSS; set up `QueryClientProvider` in `main.tsx`
-  - [ ] Add React Router with single route to `TaskListPage`
-- [ ] API client layer (AC: 1, 2, 4, 5)
-  - [ ] Create `apps/web/src/api/client.ts` — typed fetch wrapper using `VITE_API_URL`
-  - [ ] Create `apps/web/src/api/todos.ts` — `fetchTodos()`, `createTodo(input)`
-  - [ ] Import shared Zod schemas for client-side validation before submit
-- [ ] Zustand UI store (AC: 5)
-  - [ ] Create `apps/web/src/stores/ui-store.ts` with `draftDescription` + setter
-  - [ ] Persist draft on failed create; clear on successful create
-- [ ] TanStack Query hooks (AC: 1, 2, 4)
-  - [ ] Create `apps/web/src/features/todos/hooks/use-todos.ts`
-  - [ ] Query key: `['todos']`; use `isPending` for loading state
-  - [ ] Create mutation with optimistic add via `onMutate`/`onError`/`onSettled`
-- [ ] UI components (AC: 1–5)
-  - [ ] `LoadingSpinner`, `ErrorBanner`, `EmptyState` in `components/ui/`
-  - [ ] `TaskList`, `TaskItem`, `AddTaskForm` in `features/todos/`
-  - [ ] `TaskListPage` — orchestrates loading/error/empty/list states
-  - [ ] Show description, completion checkbox (read-only toggle wiring in 1.4), tags placeholder (empty until 1.6), `createdAt` formatted
-- [ ] Wire CORS (AC: 1)
-  - [ ] Ensure API cors plugin allows `http://localhost:5173`
+- [x] Frontend dependencies & setup (AC: 1–5)
+  - [x] Add TanStack Query, Zustand, React Router, Tailwind CSS to `apps/web`
+  - [x] Configure Tailwind + PostCSS; set up `QueryClientProvider` in `main.tsx`
+  - [x] Add React Router with single route to `TaskListPage`
+- [x] API client layer (AC: 1, 2, 4, 5)
+  - [x] Create `apps/web/src/api/client.ts` — typed fetch wrapper using `VITE_API_URL`
+  - [x] Create `apps/web/src/api/todos.ts` — `fetchTodos()`, `createTodo(input)`
+  - [x] Import shared Zod schemas for client-side validation before submit
+- [x] Zustand UI store (AC: 5)
+  - [x] Create `apps/web/src/stores/ui-store.ts` with `draftDescription` + setter
+  - [x] Persist draft on failed create; clear on successful create
+- [x] TanStack Query hooks (AC: 1, 2, 4)
+  - [x] Create `apps/web/src/features/todos/hooks/use-todos.ts`
+  - [x] Query key: `['todos']`; use `isPending` for loading state
+  - [x] Create mutation with optimistic add via `onMutate`/`onError`/`onSettled`
+- [x] UI components (AC: 1–5)
+  - [x] `LoadingSpinner`, `ErrorBanner`, `EmptyState` in `components/ui/`
+  - [x] `TaskList`, `TaskItem`, `AddTaskForm` in `features/todos/`
+  - [x] `TaskListPage` — orchestrates loading/error/empty/list states
+  - [x] Show description, completion checkbox (read-only toggle wiring in 1.4), tags placeholder (empty until 1.6), `createdAt` formatted
+- [x] Wire CORS (AC: 1)
+  - [x] Ensure API cors plugin allows `http://localhost:5173`
 
 ## Dev Notes
 
@@ -105,10 +105,52 @@ apps/web/src/
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Composer (Cursor)
 
 ### Debug Log References
 
+### Implementation Plan
+
+- TanStack Query owns server state (`['todos']`); Zustand holds `draftDescription` only.
+- Optimistic create via `onMutate` with rollback on `onError` and server ID replace on `onSuccess`.
+- `TaskListPage` uses `isPending` for spinner, `isSuccess && length === 0` for empty state, `ErrorBanner` + `refetch` on fetch failure.
+- Client validation via `createTodoSchema` before POST; API errors surfaced without clearing draft.
+
 ### Completion Notes List
 
+- Implemented full task list UI: load spinner, list with description/completed/tags placeholder/createdAt, add form with validation, error retry, draft preservation on failed create.
+- Added Vitest tests: `AddTaskForm.test.tsx` (validation), `client.test.ts` (API error parsing).
+- CORS in dev explicitly allows `http://localhost:5173` and `http://127.0.0.1:5173`.
+- All web tests (5) and API tests (7) pass; web build and lint pass.
+
 ### File List
+
+- apps/web/package.json
+- apps/web/tsconfig.app.json
+- apps/web/tsconfig.node.json
+- apps/web/vite.config.ts
+- apps/web/src/main.tsx
+- apps/web/src/App.tsx
+- apps/web/src/index.css
+- apps/web/src/api/client.ts
+- apps/web/src/api/client.test.ts
+- apps/web/src/api/types.ts
+- apps/web/src/api/todos.ts
+- apps/web/src/stores/ui-store.ts
+- apps/web/src/routes/index.tsx
+- apps/web/src/components/ui/LoadingSpinner.tsx
+- apps/web/src/components/ui/ErrorBanner.tsx
+- apps/web/src/components/ui/EmptyState.tsx
+- apps/web/src/features/todos/hooks/use-todos.ts
+- apps/web/src/features/todos/TaskList.tsx
+- apps/web/src/features/todos/TaskItem.tsx
+- apps/web/src/features/todos/AddTaskForm.tsx
+- apps/web/src/features/todos/AddTaskForm.test.tsx
+- apps/web/src/features/todos/pages/TaskListPage.tsx
+- apps/web/src/test/setup.ts
+- apps/api/src/app.ts
+- apps/web/src/App.css (deleted)
+
+## Change Log
+
+- 2026-05-21: Story 1.3 — view & create tasks UI with TanStack Query, Zustand draft store, optimistic create, and dev CORS for Vite.

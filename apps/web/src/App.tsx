@@ -1,15 +1,8 @@
-import { healthSchema } from '@todo-list/shared'
-import './App.css'
+import { RouterProvider } from 'react-router-dom'
+import { router } from './routes/index.js'
 
 function App() {
-  const health = healthSchema.parse({ status: 'ok' })
-
-  return (
-    <main className="app">
-      <h1>todo-list</h1>
-      <p>Web app is running. Shared package import verified: {health.status}</p>
-    </main>
-  )
+  return <RouterProvider router={router} />
 }
 
 export default App
