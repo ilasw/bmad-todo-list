@@ -1,6 +1,6 @@
 # Story 1.2: Todo Data Layer & Create/List API
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -19,25 +19,25 @@ so that tasks survive refresh and the frontend can load and create them reliably
 
 ## Tasks / Subtasks
 
-- [ ] Decide primary key type (AC: 4) — **use UUID v4** for `todos.id` (architecture gap resolution; consistent extensibility)
-- [ ] Add Drizzle ORM + Postgres driver to `apps/api` (AC: 1, 4)
-  - [ ] Create `apps/api/src/db/schema.ts` with `todos` table
-  - [ ] Add `drizzle.config.ts`; migrations output to `apps/api/drizzle/`
-  - [ ] Create `apps/api/src/plugins/db.ts` — Drizzle connection from `DATABASE_URL`
-- [ ] Shared Zod schemas (AC: 3, 4)
-  - [ ] Add `packages/shared/src/schemas/todo.ts`: `createTodoSchema` (description min 1, max 2500)
-  - [ ] Export inferred types from `packages/shared/src/types/`
-- [ ] API infrastructure (AC: 1–3)
-  - [ ] Register plugins: cors, helmet, swagger, db, zod type provider
-  - [ ] Add `apps/api/src/lib/errors.ts` — standard error helper
-  - [ ] Prefix all routes with `/api/v1`
-- [ ] Todo routes & service (AC: 1–3)
-  - [ ] `apps/api/src/services/todo-service.ts` — list + create (no tags yet; return `tagIds: []`)
-  - [ ] `apps/api/src/routes/todos.ts` — `GET /api/v1/todos`, `POST /api/v1/todos`
-  - [ ] Map DB snake_case → JSON camelCase in service layer
-- [ ] Run migrations & verify (AC: 1–4)
-  - [ ] Document migration commands in README
-  - [ ] Manual test with curl/httpie
+- [x] Decide primary key type (AC: 4) — **use UUID v4** for `todos.id` (architecture gap resolution; consistent extensibility)
+- [x] Add Drizzle ORM + Postgres driver to `apps/api` (AC: 1, 4)
+  - [x] Create `apps/api/src/db/schema.ts` with `todos` table
+  - [x] Add `drizzle.config.ts`; migrations output to `apps/api/drizzle/`
+  - [x] Create `apps/api/src/plugins/db.ts` — Drizzle connection from `DATABASE_URL`
+- [x] Shared Zod schemas (AC: 3, 4)
+  - [x] Add `packages/shared/src/schemas/todo.ts`: `createTodoSchema` (description min 1, max 2500)
+  - [x] Export inferred types from `packages/shared/src/types/`
+- [x] API infrastructure (AC: 1–3)
+  - [x] Register plugins: cors, helmet, swagger, db, zod type provider
+  - [x] Add `apps/api/src/lib/errors.ts` — standard error helper
+  - [x] Prefix all routes with `/api/v1`
+- [x] Todo routes & service (AC: 1–3)
+  - [x] `apps/api/src/services/todo-service.ts` — list + create (no tags yet; return `tagIds: []`)
+  - [x] `apps/api/src/routes/todos.ts` — `GET /api/v1/todos`, `POST /api/v1/todos`
+  - [x] Map DB snake_case → JSON camelCase in service layer
+- [x] Run migrations & verify (AC: 1–4)
+  - [x] Document migration commands in README
+  - [x] Manual test with curl/httpie
 
 ## Dev Notes
 
@@ -115,10 +115,50 @@ apps/api/drizzle/  # generated migrations
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Composer
 
 ### Debug Log References
 
+- Upgraded `zod` to v4 in `@todo-list/shared` for `fastify-type-provider-zod@6` compatibility
+- Used `fastify-plugin` on db plugin so `fastify.db` is visible to route handlers
+- Added configurable `POSTGRES_HOST_PORT` in docker-compose for local port conflicts
+
 ### Completion Notes List
 
+- Implemented Drizzle schema with UUID v4 primary key and nullable `user_id` for future auth
+- Added shared Zod schemas (`createTodoSchema`, `todoSchema`, `todoListSchema`) and inferred types
+- Built API layer: db plugin, error helpers, todo service, `/api/v1/todos` GET/POST routes
+- Registered cors, helmet, swagger, zod type provider; validation errors return `VALIDATION_ERROR` shape
+- Generated and applied initial migration (`drizzle/0000_conscious_susan_delgado.sql`)
+- Added co-located tests (6 passing) and documented migration commands in README
+- Manual curl verification: GET list, POST 201, POST 400 for empty description confirmed
+
 ### File List
+
+- `.env.example`
+- `README.md`
+- `docker-compose.yml`
+- `apps/api/package.json`
+- `apps/api/README.md`
+- `apps/api/drizzle.config.ts`
+- `apps/api/drizzle/0000_conscious_susan_delgado.sql`
+- `apps/api/drizzle/meta/0000_snapshot.json`
+- `apps/api/drizzle/meta/_journal.json`
+- `apps/api/src/app.ts`
+- `apps/api/src/server.ts`
+- `apps/api/src/db/schema.ts`
+- `apps/api/src/plugins/db.ts`
+- `apps/api/src/lib/errors.ts`
+- `apps/api/src/services/todo-service.ts`
+- `apps/api/src/services/todo-service.test.ts`
+- `apps/api/src/routes/todos.ts`
+- `apps/api/src/routes/todos.test.ts`
+- `packages/shared/package.json`
+- `packages/shared/src/index.ts`
+- `packages/shared/src/schemas/todo.ts`
+- `packages/shared/src/types/index.ts`
+- `pnpm-lock.yaml`
+
+## Change Log
+
+- 2026-05-21: Story 1.2 — Todo data layer with Drizzle migrations, shared Zod schemas, and GET/POST `/api/v1/todos` endpoints
