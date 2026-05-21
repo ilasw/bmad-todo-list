@@ -120,6 +120,51 @@ describe('todo routes', () => {
     assert.equal(body.completed, true)
   })
 
+  it('PATCH /api/v1/todos/:id persists completion status across GET', async () => {
+    const createResponse = await app.inject({
+      method: 'POST',
+      url: '/api/v1/todos',
+      payload: { description: 'Persist toggle' },
+    })
+    const created = createResponse.json()
+
+    const completeResponse = await app.inject({
+      method: 'PATCH',
+      url: `/api/v1/todos/${created.id}`,
+      payload: { completed: true },
+    })
+    assert.equal(completeResponse.statusCode, 200)
+
+    const listAfterComplete = await app.inject({
+      method: 'GET',
+      url: '/api/v1/todos',
+    })
+    assert.equal(listAfterComplete.statusCode, 200)
+    const completedTodo = listAfterComplete
+      .json()
+      .find((item: { id: string }) => item.id === created.id)
+    assert.ok(completedTodo)
+    assert.equal(completedTodo.completed, true)
+
+    const activeResponse = await app.inject({
+      method: 'PATCH',
+      url: `/api/v1/todos/${created.id}`,
+      payload: { completed: false },
+    })
+    assert.equal(activeResponse.statusCode, 200)
+
+    const listAfterActive = await app.inject({
+      method: 'GET',
+      url: '/api/v1/todos',
+    })
+    assert.equal(listAfterActive.statusCode, 200)
+    const activeTodo = listAfterActive
+      .json()
+      .find((item: { id: string }) => item.id === created.id)
+    assert.ok(activeTodo)
+    assert.equal(activeTodo.completed, false)
+  })
+
   it('PATCH /api/v1/todos/:id returns NOT_FOUND for invalid id', async () => {
     const response = await app.inject({
       method: 'PATCH',

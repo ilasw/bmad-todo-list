@@ -1,6 +1,6 @@
 # Story 1.4: Toggle Task Completion
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -127,3 +127,4 @@ Composer
 ## Change Log
 
 - 2026-05-21: Implemented toggle task completion — PATCH API, optimistic UI mutation, styling, and tests (Story 1.4)
+- 2026-05-21: Code review — per-item optimistic rollback, persistence and concurrent-toggle tests.

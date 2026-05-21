@@ -63,7 +63,8 @@ export function useToggleTodo() {
     onMutate: async ({ id, completed }) => {
       await queryClient.cancelQueries({ queryKey: TODOS_QUERY_KEY })
 
-      const previousTodos = queryClient.getQueryData<Todo[]>(TODOS_QUERY_KEY)
+      const todos = queryClient.getQueryData<Todo[]>(TODOS_QUERY_KEY)
+      const previousCompleted = todos?.find((todo) => todo.id === id)?.completed
 
       queryClient.setQueryData<Todo[]>(TODOS_QUERY_KEY, (old = []) =>
         old.map((todo) =>
@@ -71,12 +72,19 @@ export function useToggleTodo() {
         ),
       )
 
-      return { previousTodos }
+      return { id, previousCompleted }
     },
-    onError: (_error, _variables, context) => {
-      if (context?.previousTodos !== undefined) {
-        queryClient.setQueryData(TODOS_QUERY_KEY, context.previousTodos)
+    onError: (_error, { id }, context) => {
+      const previousCompleted = context?.previousCompleted
+      if (previousCompleted === undefined) {
+        return
       }
+
+      queryClient.setQueryData<Todo[]>(TODOS_QUERY_KEY, (old = []) =>
+        old.map((todo) =>
+          todo.id === id ? { ...todo, completed: previousCompleted } : todo,
+        ),
+      )
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY })
