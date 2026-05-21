@@ -1,5 +1,7 @@
 ---
-stepsCompleted: [1, 2]
+stepsCompleted: [1, 2, 3, 4]
+status: complete
+completedAt: '2026-05-21'
 inputDocuments:
   - prds/prd-todo-list-2026-05-21/prd.md
   - architecture.md
@@ -132,11 +134,12 @@ So that I can run the full-stack app locally and build features on a consistent 
 **Acceptance Criteria:**
 
 **Given** a fresh clone of the repository
-**When** I run the documented setup commands (`pnpm install`, `docker compose up db`, `pnpm --parallel -r dev`)
+**When** I run the documented setup commands (`pnpm install`, start PostgreSQL, `pnpm --parallel -r dev`)
 **Then** the Fastify API starts on port 3000 and the Vite dev server starts on port 5173
 **And** the monorepo contains `apps/web` (Vite react-ts), `apps/api` (create-fastify), and `packages/shared` (Zod) linked via pnpm workspaces
 **And** root `package.json` includes scripts for concurrent dev across workspaces
 **And** `.env.example` at repo root documents `DATABASE_URL`, `VITE_API_URL`, `NODE_ENV`, and `PORT`
+**And** a minimal `docker-compose.yml` with a `db` service (PostgreSQL 16 + named volume) is included for local development — full api/web services are added in Epic 2
 
 ### Story 1.2: Todo Data Layer & Create/List API
 
@@ -352,6 +355,7 @@ So that I can deploy consistently on any Docker-capable host (FR15).
 **Given** the repository with Docker configuration
 **When** I run `docker compose up` with the documented commands
 **Then** `db` (PostgreSQL 16), `api` (Fastify), and `web` (nginx serving Vite build) services start successfully
+**And** the existing `db` service from Story 1.1 is extended — not replaced — with `api` and `web` services
 **And** the web app is accessible and communicates with the API via `VITE_API_URL`
 
 **Given** separate Dockerfiles in `apps/api` and `apps/web`
