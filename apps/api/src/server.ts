@@ -18,12 +18,17 @@ function parsePort(value: string | undefined, fallback: number): number {
 const port = parsePort(process.env.PORT, 3000)
 
 const start = async () => {
-  const fastify = await buildServer()
-
   try {
-    await fastify.listen({ port, host: '0.0.0.0' })
+    const fastify = await buildServer()
+
+    try {
+      await fastify.listen({ port, host: '0.0.0.0' })
+    } catch (err) {
+      fastify.log.error(err)
+      process.exit(1)
+    }
   } catch (err) {
-    fastify.log.error(err)
+    console.error(err)
     process.exit(1)
   }
 }

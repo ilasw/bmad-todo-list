@@ -1,6 +1,6 @@
 # Story 1.2: Todo Data Layer & Create/List API
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -162,3 +162,26 @@ Composer
 ## Change Log
 
 - 2026-05-21: Story 1.2 — Todo data layer with Drizzle migrations, shared Zod schemas, and GET/POST `/api/v1/todos` endpoints
+- 2026-05-21: Code review — applied 10 patch fixes (test cleanup, validation, docs, start script)
+
+### Review Findings
+
+- [x] [Review][Patch] Integration tests need per-test DB cleanup — Decision: **A** (keep integration tests; add `beforeEach`/`afterEach` cleanup of test todos) [apps/api/src/routes/todos.test.ts, apps/api/src/services/todo-service.test.ts]
+- [x] [Review][Patch] `start` script no longer runs compiled output [apps/api/package.json:9]
+- [x] [Review][Patch] Whitespace-only descriptions pass validation [packages/shared/src/schemas/todo.ts:4]
+- [x] [Review][Patch] Redundant body re-parse duplicates Fastify/Zod validation [apps/api/src/routes/todos.ts:37]
+- [x] [Review][Patch] `POSTGRES_HOST_PORT` can disagree with `DATABASE_URL` port [.env.example:2]
+- [x] [Review][Patch] GET route test does not assert AC1 response shape [apps/api/src/routes/todos.test.ts:17]
+- [x] [Review][Patch] Response `todoSchema` allows unbounded description strings [packages/shared/src/schemas/todo.ts:9]
+- [x] [Review][Patch] `buildServer()` failure in `start()` is an unhandled rejection [apps/api/src/server.ts:20]
+- [x] [Review][Patch] Service test name claims empty list but only checks `Array.isArray` [apps/api/src/services/todo-service.test.ts:18]
+- [x] [Review][Patch] Manual verification docs omit >2500-char POST example [README.md:56]
+
+- [x] [Review][Defer] CORS configured with `origin: true` for all environments [apps/api/src/app.ts:61] — deferred, pre-existing dev pattern; tighten before production deploy
+- [x] [Review][Defer] GET list has no pagination or result cap [apps/api/src/services/todo-service.ts:16] — deferred, out of story 1.2 scope
+- [x] [Review][Defer] Swagger UI registered unconditionally at `/docs` [apps/api/src/app.ts:76] — deferred, acceptable for v1 dev
+- [x] [Review][Defer] No index on `created_at` despite list ordering [apps/api/drizzle/0000_conscious_susan_delgado.sql:5] — deferred, optimize when list size warrants
+- [x] [Review][Defer] `user_id` stored but not scoped in queries [apps/api/src/services/todo-service.ts:17] — deferred, intentional until auth (NFR4)
+- [x] [Review][Defer] cors/helmet/swagger registered inline instead of separate plugin files [apps/api/src/app.ts:60] — deferred, file-structure preference not AC
+- [x] [Review][Defer] Health endpoint does not verify database connectivity [apps/api/src/app.ts:82] — deferred, story 1.1 health check scope
+- [x] [Review][Defer] No graceful shutdown handlers (SIGINT/SIGTERM) [apps/api/src/server.ts:20] — deferred, Epic 2 container lifecycle

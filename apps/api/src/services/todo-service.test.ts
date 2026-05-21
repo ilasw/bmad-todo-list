@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
-import { after, before, describe, it } from 'node:test'
+import { after, before, beforeEach, describe, it } from 'node:test'
 import { buildServer } from '../app.js'
+import { clearTodos } from '../test/db-cleanup.js'
 import { createTodo, listTodos } from './todo-service.js'
 
 describe('todo-service', () => {
@@ -11,13 +12,18 @@ describe('todo-service', () => {
     await app.ready()
   })
 
+  beforeEach(async () => {
+    await clearTodos(app)
+  })
+
   after(async () => {
+    await clearTodos(app)
     await app.close()
   })
 
   it('listTodos returns an empty array when no todos exist', async () => {
     const todos = await listTodos(app)
-    assert.ok(Array.isArray(todos))
+    assert.deepEqual(todos, [])
   })
 
   it('createTodo persists and maps snake_case rows to camelCase JSON', async () => {

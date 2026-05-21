@@ -32,7 +32,7 @@ Full-stack todo app monorepo: React (Vite) + Fastify API + PostgreSQL.
    docker compose up db
    ```
 
-   The database listens on `localhost:5432` by default (override with `POSTGRES_HOST_PORT` in `.env` if port 5432 is already in use).
+   The database listens on `localhost:5432` by default (override with `POSTGRES_HOST_PORT` in `.env` if port 5432 is already in use — update `DATABASE_URL` to use the same port).
 
 5. **Run database migrations**
 
@@ -64,6 +64,11 @@ curl -X POST http://localhost:3000/api/v1/todos \
   -H 'Content-Type: application/json' \
   -d '{"description":"Buy groceries"}'
 # HTTP 201 with todo JSON (id, description, completed, createdAt, tagIds)
+
+curl -X POST http://localhost:3000/api/v1/todos \
+  -H 'Content-Type: application/json' \
+  -d '{"description":"<string longer than 2500 characters>"}'
+# HTTP 400 with {"error":{"code":"VALIDATION_ERROR",...}}
 ```
 
 Open http://localhost:5173 in your browser — you should see the placeholder page.

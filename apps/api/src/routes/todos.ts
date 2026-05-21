@@ -32,10 +32,7 @@ const todoRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (request, reply) => {
-      const todo = await createTodo(
-        request.server,
-        createTodoSchema.parse(request.body),
-      )
+      const todo = await createTodo(request.server, request.body)
       return reply.status(201).send(todo)
     },
   )
